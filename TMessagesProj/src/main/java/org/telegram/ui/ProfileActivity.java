@@ -2237,6 +2237,9 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         actionBar.setActionBarMenuOnItemClick(new ActionBar.ActionBarMenuOnItemClick() {
             @Override
             public void onItemClick(final int id) {
+                ActionBarMenu menu = actionBar.createMenu();
+                menu.addItem(0, R.drawable.ic_ab_other);
+
                 if (getParentActivity() == null) {
                     return;
                 }
@@ -4812,7 +4815,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
 
         topView = new TopView(context);
         topView.setBackgroundColorId(peerColor, false);
-        topView.setBackgroundColor(getThemedColor(Theme.key_avatar_backgroundActionBarBlue));
+        topView.setBackgroundColor(Color.parseColor("#8A60F3"));
         frameLayout.addView(topView);
         contentView.blurBehindViews.add(topView);
 
@@ -4906,7 +4909,8 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         frameLayout.addView(avatarContainer2, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT, Gravity.START, 0, 0, 0, 0));
         avatarContainer.setPivotX(0);
         avatarContainer.setPivotY(0);
-        avatarContainer2.addView(avatarContainer, LayoutHelper.createFrame(42, 42, Gravity.TOP | Gravity.LEFT, 64, 0, 0, 0));
+        avatarContainer2.addView(avatarContainer, LayoutHelper.createFrame(80, 80, Gravity.TOP | Gravity.CENTER_HORIZONTAL, 0, 20, 0, 0));
+
         avatarImage = new AvatarImageView(context) {
             @Override
             public void onInitializeAccessibilityNodeInfo(AccessibilityNodeInfo info) {
@@ -5120,7 +5124,8 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
             nameTextView[a].setFocusable(a == 0);
             nameTextView[a].setEllipsizeByGradient(true);
             nameTextView[a].setRightDrawableOutside(a == 0);
-            avatarContainer2.addView(nameTextView[a], LayoutHelper.createFrame(a == 0 ? initialTitleWidth : LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.LEFT | Gravity.TOP, 118, -6, (a == 0 ? rightMargin - (hasTitleExpanded ? 10 : 0) : 0), 0));
+            avatarContainer2.addView(nameTextView[a], LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.TOP | Gravity.CENTER_HORIZONTAL, 0, 112, 0, 0));
+
         }
         for (int a = 0; a < onlineTextView.length; a++) {
             if (a == 1) {
@@ -5174,10 +5179,17 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 onlineTextView[a].setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
             }
             onlineTextView[a].setFocusable(a == 0);
-            avatarContainer2.addView(onlineTextView[a], LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.LEFT | Gravity.TOP, 118 - (a == 1 || a == 2 || a == 3? 4 : 0), (a == 1 || a == 2 || a == 3 ? -2 : 0), (a == 0 ? rightMargin - (hasTitleExpanded ? 10 : 0) : 8) - (a == 1 || a == 2 || a == 3 ? 4 : 0), 0));
+            avatarContainer2.addView(onlineTextView[a], LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.TOP | Gravity.CENTER_HORIZONTAL, 0, 138, 0, 0));
+
         }
         checkPhotoDescriptionAlpha();
-        avatarContainer2.addView(animatedStatusView);
+        avatarContainer2.addView(animatedStatusView, LayoutHelper.createFrame(
+                LayoutHelper.WRAP_CONTENT,
+                LayoutHelper.WRAP_CONTENT,
+                Gravity.TOP | Gravity.CENTER_HORIZONTAL,
+                0, 136, 0, 0));
+
+
 
         mediaCounterTextView = new AudioPlayerAlert.ClippingTextViewSwitcher(context) {
             @Override
@@ -5437,6 +5449,40 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         if (openGifts || openCommonChats) {
             AndroidUtilities.runOnUIThread(this::scrollToSharedMedia);
         }
+
+
+        LinearLayout cardsLayout = new LinearLayout(context);
+        cardsLayout.setOrientation(LinearLayout.HORIZONTAL);
+        cardsLayout.setGravity(Gravity.CENTER);
+        cardsLayout.setPadding(AndroidUtilities.dp(8), AndroidUtilities.dp(4), AndroidUtilities.dp(8), AndroidUtilities.dp(4));
+
+        String[] labels = {"Message", "Unmute", "Call", "Video"};
+        int[] icons = {R.drawable.ic_message, R.drawable.ic_unmute, R.drawable.ic_call, R.drawable.ic_video};
+
+        for (int i = 0; i < labels.length; i++) {
+            LinearLayout button = new LinearLayout(context);
+            button.setOrientation(LinearLayout.VERTICAL);
+            button.setGravity(Gravity.CENTER);
+            button.setBackground(Theme.createRoundRectDrawable(AndroidUtilities.dp(8), Theme.getColor(Color.parseColor("#8A60F3"))));
+
+            ImageView icon = new ImageView(context);
+            icon.setImageResource(icons[i]); // Use your contest-provided icons
+            icon.setColorFilter(new PorterDuffColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN));
+            button.addView(icon, LayoutHelper.createLinear(AndroidUtilities.dp(28), AndroidUtilities.dp(28)));
+
+            TextView label = new TextView(context);
+            label.setText(labels[i]);
+            label.setTextColor(Color.WHITE);
+            label.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+            button.addView(label, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER, 0, 4, 0, 0));
+
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
+            params.setMargins(AndroidUtilities.dp(4), 0, AndroidUtilities.dp(4), 0);
+            cardsLayout.addView(button, params);
+        }
+
+
+        contentView.addView(cardsLayout, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.TOP | Gravity.CENTER_HORIZONTAL, 0, 160 + AndroidUtilities.dp(8), 0, 0));
 
         return fragmentView;
     }
